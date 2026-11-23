@@ -30,9 +30,17 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 		return 0, "", 0, err
 	}
 
+	if steps <= 0 {
+		return 0, "", 0, errors.New("Ошибка парсинга (количество шагов равно 0)")
+	}
+
 	duration, err := time.ParseDuration(slice[2])
 	if err != nil {
 		return 0, "", 0, err
+	}
+
+	if duration <= 0 {
+		return 0, "", 0, errors.New("Неверное время")
 	}
 
 	return steps, slice[1], duration, nil
@@ -72,7 +80,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	case "Ходьба":
 		calories, err = WalkingSpentCalories(steps, weight, height, duration)
 	default:
-		return "", errors.New("Неизвестный тип активности")
+		return "", errors.New("неизвестный тип тренировки")
 	}
 
 	if err != nil {
@@ -97,6 +105,10 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 		return 0, errors.New("Некоректные входящие данные")
 	}
 
+	if duration <= 0 {
+		return 0, errors.New("Неверное время")
+	}
+
 	durationInMinutes := float64(duration.Minutes())
 
 	calories := (weight * meanSpeed(steps, height, duration) * durationInMinutes) / float64(minInH)
@@ -107,6 +119,10 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	// TODO: реализовать функцию
 	if steps <= 0 || weight <= 0 || height <= 0 {
 		return 0, errors.New("Некоректные входящие данные")
+	}
+
+	if duration <= 0 {
+		return 0, errors.New("Неверное время")
 	}
 
 	durationInMinutes := float64(duration.Minutes())
